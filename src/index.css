@@ -42,7 +42,7 @@ html.dark {
 }
 
 .fade-in-soft {
-  animation: fade-in 0.45s ease-out both;
+  animation: fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes slide-in {
@@ -57,7 +57,79 @@ html.dark {
 }
 
 .slide-in {
-  animation: slide-in 0.35s ease-out both;
+  animation: slide-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes month-enter-next {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes month-enter-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes month-title-next {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes month-title-prev {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.month-grid {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.month-grid.is-next {
+  animation-name: month-enter-next;
+}
+
+.month-grid.is-prev {
+  animation-name: month-enter-prev;
+}
+
+.month-title {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.month-title.is-next {
+  animation-name: month-title-next;
+}
+
+.month-title.is-prev {
+  animation-name: month-title-prev;
 }
 
 @keyframes glow {
@@ -90,6 +162,43 @@ html.dark {
   padding: 1.1rem;
 }
 
+.device-iphone-12 body,
+.device-iphone-14 body,
+.device-iphone-16 body {
+  font-size: 15.5px;
+}
+
+.device-iphone-12 .max-w-md,
+.device-iphone-14 .max-w-md,
+.device-iphone-16 .max-w-md {
+  max-width: 24rem;
+}
+
+.device-iphone-12 .px-4,
+.device-iphone-14 .px-4,
+.device-iphone-16 .px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.device-iphone-12 .p-4,
+.device-iphone-14 .p-4,
+.device-iphone-16 .p-4 {
+  padding: 1rem;
+}
+
+.device-iphone-12 .text-xl,
+.device-iphone-14 .text-xl,
+.device-iphone-16 .text-xl {
+  font-size: 1.15rem;
+}
+
+.device-iphone-12 .text-lg,
+.device-iphone-14 .text-lg,
+.device-iphone-16 .text-lg {
+  font-size: 1.05rem;
+}
+
 .device-a56 body {
   font-size: 15px;
 }
@@ -119,8 +228,8 @@ html.dark {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transform: translateY(-6px);
-  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease;
+  transform: translateY(-4px);
+  transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, transform 0.4s ease;
 }
 
 .collapsible-panel.is-open {
@@ -129,13 +238,44 @@ html.dark {
   transform: translateY(0);
 }
 
+.collapsible-panel .collapsible-content {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.992);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapsible-panel.is-open .collapsible-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.day-preview {
+  max-height: 80px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease;
+}
+
+.day-preview.is-hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-in-soft,
   .slide-in,
-  .glow-soft {
+  .glow-soft,
+  .month-grid,
+  .month-title {
     animation: none;
   }
   .collapsible-panel {
+    transition: none;
+  }
+  .collapsible-panel .collapsible-content,
+  .day-preview {
     transition: none;
   }
 }
