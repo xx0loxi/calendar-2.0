@@ -422,7 +422,7 @@ function App() {
 
       <main className="max-w-md mx-auto px-4 py-4 space-y-3 relative">
         <div className="flex justify-center -my-0.5">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider bg-slate-50/90 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full shadow-sm">Версія 3.1.0</span>
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider bg-slate-50/90 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full shadow-sm">Версія 3.1.1</span>
         </div>
         <form onSubmit={addCustomLesson} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-3 fade-in-soft">
           <div className="flex items-center justify-between">
@@ -556,7 +556,7 @@ function App() {
             <button
               type="button"
               onClick={() => toggleDayOpen(dayKey)}
-              className="w-full text-left bg-slate-50/90 dark:bg-slate-800/70 backdrop-blur px-3 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-all"
+              className="day-toggle w-full text-left bg-slate-50/90 dark:bg-slate-800/70 backdrop-blur px-3 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-all"
               aria-expanded={isOpen}
             >
               <div className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg">
@@ -577,7 +577,7 @@ function App() {
                   {missedCount}
                 </span>
               )}
-              <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
+              <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-slate-300 transition-transform duration-500 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
             </button>
 
             <div className={`collapsible-panel ${isOpen ? 'is-open' : ''}`}>
