@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { scheduleData, type Lesson } from './data/schedule'
+import { scheduleData, type Lesson, type DaySchedule } from './data/schedule'
 import { CheckCircle2, XCircle, Calendar, User, MapPin, ChevronLeft, ChevronRight, Plus, ChevronDown } from 'lucide-react'
 
 function App() {
@@ -102,6 +102,36 @@ function App() {
     currentMonth.getMonth() === today.getMonth();
   const monthLabel = currentMonth.toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
   const monthTitle = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+  const scheduleById = scheduleData.reduce<Record<string, DaySchedule>>((acc, day) => {
+    acc[day.id] = day;
+    return acc;
+  }, {});
+
+  const getMonthDays = (monthDate: Date) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days: Array<{ date: Date; dayId: string; dayName: string; lessons: Lesson[] }> = [];
+    for (let dayNumber = 1; dayNumber <= daysInMonth; dayNumber += 1) {
+      const date = new Date(year, month, dayNumber);
+      const weekday = date.getDay();
+      if (weekday === 0 || weekday === 6) {
+        continue;
+      }
+      const dayId = `day-${weekday}`;
+      const dayInfo = scheduleById[dayId];
+      if (!dayInfo) {
+        continue;
+      }
+      days.push({
+        date,
+        dayId,
+        dayName: dayInfo.dayName,
+        lessons: dayInfo.lessons,
+      });
+    }
+    return days;
+  };
 
   const goPrevMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -117,6 +147,7 @@ function App() {
   const [formTeacher, setFormTeacher] = useState('');
   const [formIndex, setFormIndex] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(true);
+  const [openDays, setOpenDays] = useState<Set<string>>(() => new Set());
 
   const getNextIndex = (dayId: string) => {
     const base = scheduleData.find(day => day.id === dayId)?.lessons ?? [];
@@ -164,7 +195,28 @@ function App() {
     });
   };
 
-  const totalMissed = missedLessons.size;
+  const toggleDayOpen = (dayKey: string) => {
+    setOpenDays(prev => {
+      const next = new Set(prev);
+      if (next.has(dayKey)) {
+        next.delete(dayKey);
+      } else {
+        next.add(dayKey);
+      }
+      return next;
+    });
+  };
+
+  const monthDays = getMonthDays(currentMonth);
+  const monthMissedCount = monthDays.reduce((acc, day) => {
+    const extraLessons = customLessons[day.dayId] ?? [];
+    const allLessons = [...day.lessons, ...extraLessons];
+    const dayKey = `${day.dayId}-${day.date.toISOString()}`;
+    return acc + allLessons.reduce((innerAcc, lesson) => {
+      const lessonKey = `${dayKey}:${lesson.id}`;
+      return missedLessons.has(lessonKey) ? innerAcc + 1 : innerAcc;
+    }, 0);
+  }, 0);
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 pb-12 font-sans transition-colors duration-300">
@@ -177,7 +229,7 @@ function App() {
             </div>
             <div className="flex items-center gap-2 bg-red-50/90 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-full border border-red-100 dark:border-red-900/60 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-wider">Пропуски</span>
-              <span className="font-bold text-lg leading-none">{totalMissed}</span>
+              <span className="font-bold text-lg leading-none">{monthMissedCount}</span>
             </div>
           </div>
 
@@ -303,25 +355,49 @@ function App() {
           </div>
         </form>
 
-        {scheduleData.map((day) => (
-          <div key={day.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden fade-in-soft">
-            <div className="bg-slate-50/90 dark:bg-slate-800/70 backdrop-blur px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2 sticky top-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {monthDays.map((day) => {
+          const dateLabel = day.date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
+          const extraLessons = customLessons[day.dayId] ?? [];
+          const allLessons = [...day.lessons, ...extraLessons].slice().sort((a, b) => a.index - b.index);
+          const dayKey = `${day.dayId}-${day.date.toISOString()}`;
+          const isOpen = openDays.has(dayKey);
+          const missedCount = allLessons.reduce((acc, lesson) => {
+            const lessonKey = `${dayKey}:${lesson.id}`;
+            return missedLessons.has(lessonKey) ? acc + 1 : acc;
+          }, 0);
+          return (
+          <div key={dayKey} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden fade-in-soft">
+            <button
+              type="button"
+              onClick={() => toggleDayOpen(dayKey)}
+              className="w-full text-left bg-slate-50/90 dark:bg-slate-800/70 backdrop-blur px-3 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-all"
+              aria-expanded={isOpen}
+            >
               <div className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg">
                 <Calendar className="w-4 h-4" />
               </div>
-              <h2 className="font-bold text-slate-800 dark:text-slate-100 text-lg">{day.dayName}</h2>
-            </div>
-            
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {[...day.lessons, ...(customLessons[day.id] ?? [])]
-                .slice()
-                .sort((a, b) => a.index - b.index)
-                .map((lesson) => {
-                const isMissed = missedLessons.has(lesson.id);
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{day.dayName}</h2>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">{dateLabel}</span>
+              </div>
+              {!isOpen && missedCount > 0 && (
+                <span className="min-w-[24px] h-6 px-1 rounded-full bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-200 text-xs font-bold flex items-center justify-center border border-red-200 dark:border-red-800/70">
+                  {missedCount}
+                </span>
+              )}
+              <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`collapsible-panel ${isOpen ? 'is-open' : ''}`}>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {allLessons.map((lesson) => {
+                const lessonKey = `${dayKey}:${lesson.id}`;
+                const isMissed = missedLessons.has(lessonKey);
                 const isCustom = lesson.id.startsWith('custom-');
                 return (
                   <div 
-                    key={lesson.id} 
+                    key={lessonKey} 
                     className={`p-4 transition-all duration-200 slide-in ${
                       isMissed ? 'bg-red-50/40 dark:bg-red-950/30' : 'bg-white dark:bg-slate-900 hover:bg-slate-50/90 dark:hover:bg-slate-800/70'
                     }`}
@@ -360,7 +436,7 @@ function App() {
                       </div>
 
                       <button
-                        onClick={() => toggleMissed(lesson.id)}
+                        onClick={() => toggleMissed(lessonKey)}
                         className={`flex-shrink-0 p-2 rounded-xl transition-all duration-200 active:scale-95 ${
                           isMissed 
                             ? 'bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300 shadow-inner' 
@@ -374,14 +450,16 @@ function App() {
                   </div>
                 );
               })}
-              {day.lessons.length === 0 && (
-                <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm italic">
-                  Пар немає
-                </div>
-              )}
+                {allLessons.length === 0 && (
+                  <div className="p-6 text-center text-slate-400 dark:text-slate-500 text-sm italic">
+                    Пар немає
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        ))}
+        )})}
+        </div>
       </main>
     </div>
   )
