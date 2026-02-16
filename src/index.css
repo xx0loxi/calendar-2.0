@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-slate-200 dark:border-slate-800;
+  }
+  body {
+    @apply bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+  }
+}
+
+html {
+  background-color: #f1f5f9;
+}
+
+html.dark {
+  background-color: #0b1220;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-soft {
+  animation: fade-in 0.45s ease-out both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.slide-in {
+  animation: slide-in 0.35s ease-out both;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
+  }
+}
+
+.glow-soft {
+  animation: glow 2.2s ease-in-out infinite;
+}
+
+.device-iphone-11 body {
+  font-size: 16px;
+}
+
+.device-iphone-11 .max-w-md {
+  max-width: 28rem;
+}
+
+.device-iphone-11 .px-4 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.device-iphone-11 .p-4 {
+  padding: 1.1rem;
+}
+
+.device-a56 body {
+  font-size: 15px;
+}
+
+.device-a56 .max-w-md {
+  max-width: 22rem;
+}
+
+.device-a56 .px-4 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.device-a56 .p-4 {
+  padding: 0.85rem;
+}
+
+.device-a56 .text-xl {
+  font-size: 1.1rem;
+}
+
+.device-a56 .text-lg {
+  font-size: 1rem;
+}
+
+.collapsible-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-6px);
+  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease;
+}
+
+.collapsible-panel.is-open {
+  max-height: 900px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-soft,
+  .slide-in,
+  .glow-soft {
+    animation: none;
+  }
+  .collapsible-panel {
+    transition: none;
+  }
+}
