@@ -146,7 +146,7 @@ function App() {
   const [formRoom, setFormRoom] = useState('');
   const [formTeacher, setFormTeacher] = useState('');
   const [formIndex, setFormIndex] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [openDays, setOpenDays] = useState<Set<string>>(() => new Set());
 
   const getNextIndex = (dayId: string) => {
@@ -227,7 +227,11 @@ function App() {
               <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Розклад</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Група БН-ІІІ-2</p>
             </div>
-            <div className="flex items-center gap-2 bg-red-50/90 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-full border border-red-100 dark:border-red-900/60 shadow-sm">
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all ${
+              monthMissedCount > 0
+                ? 'bg-red-50/90 dark:bg-red-950/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-900/70 shadow-red-100/60 dark:shadow-red-950/40'
+                : 'bg-slate-50/90 dark:bg-slate-800/70 text-slate-500 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+            }`}>
               <span className="text-xs font-bold uppercase tracking-wider">Пропуски</span>
               <span className="font-bold text-lg leading-none">{monthMissedCount}</span>
             </div>
@@ -244,7 +248,9 @@ function App() {
             <div className="flex flex-col items-center gap-0.5">
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{monthTitle}</span>
               {isCurrentMonth && (
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 glow-soft">Поточний місяць</span>
+                <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50/90 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-900/60 px-2 py-0.5 rounded-full shadow-sm glow-soft">
+                  Поточний місяць
+                </span>
               )}
             </div>
             <button
@@ -362,6 +368,9 @@ function App() {
           const allLessons = [...day.lessons, ...extraLessons].slice().sort((a, b) => a.index - b.index);
           const dayKey = `${day.dayId}-${day.date.toISOString()}`;
           const isOpen = openDays.has(dayKey);
+          const lessonCount = allLessons.length;
+          const previewSubjects = allLessons.slice(0, 2).map(lesson => lesson.subject).join(', ');
+          const moreCount = lessonCount > 2 ? lessonCount - 2 : 0;
           const missedCount = allLessons.reduce((acc, lesson) => {
             const lessonKey = `${dayKey}:${lesson.id}`;
             return missedLessons.has(lessonKey) ? acc + 1 : acc;
@@ -380,9 +389,17 @@ function App() {
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{day.dayName}</h2>
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">{dateLabel}</span>
+                {!isOpen && (
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex flex-wrap gap-x-2 gap-y-0.5">
+                    <span className="font-semibold text-slate-600 dark:text-slate-300">Пар: {lessonCount}</span>
+                    {previewSubjects && (
+                      <span className="truncate max-w-[160px]">{previewSubjects}{moreCount > 0 ? ` +${moreCount}` : ''}</span>
+                    )}
+                  </div>
+                )}
               </div>
               {!isOpen && missedCount > 0 && (
-                <span className="min-w-[24px] h-6 px-1 rounded-full bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-200 text-xs font-bold flex items-center justify-center border border-red-200 dark:border-red-800/70">
+                <span className="min-w-[24px] h-6 px-1 rounded-full bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-200 text-xs font-bold flex items-center justify-center border border-red-200 dark:border-red-800/70 shadow-sm shadow-red-100/70 dark:shadow-red-950/50">
                   {missedCount}
                 </span>
               )}
