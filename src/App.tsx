@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { scheduleGroups, type Lesson, type DaySchedule } from './data/schedule'
-import { CheckCircle2, XCircle, Calendar, User, MapPin, ChevronLeft, ChevronRight, Plus, ChevronDown } from 'lucide-react'
+import { CheckCircle2, XCircle, User, MapPin, ChevronLeft, ChevronRight, Plus, ChevronDown } from 'lucide-react'
 
 function App() {
   const canUseStorage = typeof window !== 'undefined' && 'localStorage' in window;
@@ -566,7 +566,7 @@ function App() {
             <button
               type="button"
               onClick={() => toggleDayOpen(dayKey)}
-              className={`day-toggle w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${
+              className={`day-toggle group w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${
                 isOpen
                   ? 'rounded-t-2xl'
                   : 'rounded-2xl hover:bg-slate-50/90 dark:hover:bg-slate-800/80 hover:shadow-sm border border-slate-200/80 dark:border-slate-800/80'
@@ -574,8 +574,13 @@ function App() {
               style={{ transitionDelay: isOpen ? '0ms' : '160ms' }}
               aria-expanded={isOpen}
             >
-              <div className="p-2 bg-blue-100/80 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-xl shadow-sm">
-                <Calendar className="w-4 h-4" />
+              <div className="p-2 bg-blue-100/80 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-xl shadow-sm transition-colors duration-300 group-hover:bg-blue-200/80 dark:group-hover:bg-blue-900/60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 transition-transform duration-300 group-hover:scale-110">
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" className="fill-current opacity-20" />
+                  <path d="M3 10h18" />
+                </svg>
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{day.dayName}</h2>
