@@ -352,78 +352,87 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 pb-12 font-sans transition-colors duration-300">
-      <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-md mx-auto px-4 py-4 space-y-3">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Розклад</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Група {activeGroup?.label ?? '—'}</p>
+      <header className="sticky top-0 z-10">
+        <div className="bg-gradient-to-b from-white via-white/95 to-slate-100/80 dark:from-slate-950 dark:via-slate-900/90 dark:to-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 backdrop-blur">
+          <div className="max-w-md mx-auto px-4 pt-3 pb-3 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Розклад</h1>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/70 text-slate-600 dark:text-slate-300 text-xs font-semibold shadow-sm">
+                  <span className="uppercase tracking-widest text-[9px] text-slate-400 dark:text-slate-500">Група</span>
+                  <span className="text-slate-800 dark:text-slate-100">{activeGroup?.label ?? '—'}</span>
+                </div>
+              </div>
+              <div className={`mt-1 min-w-[92px] rounded-2xl border px-2.5 py-1 shadow-sm transition-all ${
+                monthMissedCount > 0
+                  ? 'bg-red-200/90 dark:bg-red-800/60 text-red-800 dark:text-red-100 border-red-300/80 dark:border-red-700/80 shadow-red-200/70 dark:shadow-red-950/60 glow-red'
+                  : 'bg-slate-100/90 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+              }`}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[9px] font-semibold uppercase tracking-widest">Пропуски</span>
+                  <span className="text-base font-bold leading-none">{monthMissedCount}</span>
+                </div>
+              </div>
             </div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all ${
-              monthMissedCount > 0
-                ? 'bg-red-200 dark:bg-red-800/70 text-red-800 dark:text-red-100 border-red-300 dark:border-red-700 shadow-red-200/80 dark:shadow-red-950/60 glow-red'
-                : 'bg-slate-50/90 dark:bg-slate-800/70 text-slate-500 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-            }`}>
-              <span className="text-xs font-bold uppercase tracking-wider">Пропуски</span>
-              <span className="font-bold text-lg leading-none">{monthMissedCount}</span>
+
+            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 p-1.5 shadow-sm">
+              <div className="grid grid-cols-2 gap-2">
+                {scheduleGroups.map(group => {
+                  const isActive = group.id === activeGroup?.id;
+                  return (
+                    <button
+                      key={group.id}
+                      type="button"
+                      onClick={() => setActiveGroupId(group.id)}
+                      className={`rounded-xl px-3 py-2 text-[11px] font-semibold border transition-all duration-200 ${
+                        isActive
+                          ? 'bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 shadow-sm'
+                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {group.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="flex w-full gap-2">
-            {scheduleGroups.map(group => {
-              const isActive = group.id === activeGroup?.id;
-              return (
-                <button
-                  key={group.id}
-                  type="button"
-                  onClick={() => setActiveGroupId(group.id)}
-                  className={`flex-1 rounded-full px-3 py-2 text-[11px] font-semibold border transition-all duration-200 ${
-                    isActive
-                      ? 'bg-blue-50/90 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-900/60 shadow-sm'
-                      : 'bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {group.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-800/70 px-3 py-2 transition-colors duration-300">
-            <button
-              onClick={goPrevMonth}
-              className="p-2 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 active:scale-95"
-              aria-label="Попередній місяць"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="flex flex-col items-center gap-0.5">
-              <span
-                key={`${currentMonth.getFullYear()}-${currentMonth.getMonth()}`}
-                className={`month-title text-sm font-semibold text-slate-900 dark:text-slate-100 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 px-3 py-2.5 shadow-sm">
+              <button
+                onClick={goPrevMonth}
+                className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all duration-200 active:scale-95"
+                aria-label="Попередній місяць"
               >
-                {monthTitle}
-              </span>
-              {isCurrentMonth && (
-                <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50/90 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-900/60 px-2 py-0.5 rounded-full shadow-sm glow-soft badge-enter">
-                  Поточний місяць
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex flex-col items-center gap-1">
+                <span
+                  key={`${currentMonth.getFullYear()}-${currentMonth.getMonth()}`}
+                  className={`month-title text-sm font-semibold text-slate-900 dark:text-slate-100 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
+                >
+                  {monthTitle}
                 </span>
-              )}
+                {isCurrentMonth && (
+                  <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50/90 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-900/60 px-2 py-0.5 rounded-full shadow-sm glow-soft badge-enter uppercase tracking-widest">
+                    Поточний місяць
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={goNextMonth}
+                className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all duration-200 active:scale-95"
+                aria-label="Наступний місяць"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={goNextMonth}
-              className="p-2 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 active:scale-95"
-              aria-label="Наступний місяць"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </header>
 
       <main className="max-w-md mx-auto px-4 py-4 space-y-3 relative">
         <div className="flex justify-center -my-0.5">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider bg-slate-50/90 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full shadow-sm">Версія 3.1.4</span>
+          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 px-2.5 py-0.5 rounded-full shadow-sm shadow-slate-200/70 dark:shadow-slate-950/40 tracking-wide">Версія 3.1.5</span>
         </div>
         <form onSubmit={addCustomLesson} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-3 fade-in-soft">
           <div className="flex items-center justify-between">
@@ -442,7 +451,7 @@ function App() {
           </div>
 
           <div className={`collapsible-panel ${isFormOpen ? 'is-open' : ''}`}>
-            <div className="space-y-3 pt-1">
+            <div className="space-y-3 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/80 p-3 shadow-sm">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Дні місяця</span>
@@ -526,7 +535,7 @@ function App() {
 
         <div
           key={`${currentMonth.getFullYear()}-${currentMonth.getMonth()}`}
-          className={`month-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
+          className={`month-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
         >
         {monthDays.map((day) => {
           const dateLabel = day.date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
@@ -557,7 +566,11 @@ function App() {
             <button
               type="button"
               onClick={() => toggleDayOpen(dayKey)}
-              className={`day-toggle w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3.5 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${isOpen ? 'rounded-t-2xl' : 'rounded-2xl'}`}
+              className={`day-toggle w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${
+                isOpen
+                  ? 'rounded-t-2xl'
+                  : 'rounded-2xl hover:bg-slate-50/90 dark:hover:bg-slate-800/80 hover:shadow-sm border border-slate-200/80 dark:border-slate-800/80'
+              }`}
               style={{ transitionDelay: isOpen ? '0ms' : '160ms' }}
               aria-expanded={isOpen}
             >
@@ -592,7 +605,7 @@ function App() {
             </button>
 
             <div className={`collapsible-panel ${isOpen ? 'is-open' : ''}`}>
-              <div className="collapsible-content divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="collapsible-content">
                 {allLessons.map((lesson) => {
                 const lessonKey = `${dayKey}:${lesson.id}`;
                 const legacyLessonKey = `${legacyDayKey}:${lesson.id}`;
@@ -602,7 +615,7 @@ function App() {
                 return (
                   <div 
                     key={lessonKey} 
-                    className={`p-4 last:pb-3 transition-all duration-250 slide-in ${
+                    className={`p-4 last:pb-3 last:rounded-b-2xl transition-all duration-250 slide-in ${
                       isMissed ? 'bg-red-50/80 dark:bg-red-950/30 border border-red-200/70 dark:border-red-900/60 shadow-sm shadow-red-100/60 dark:shadow-red-950/40' : 'bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:shadow-sm'
                     }`}
                   >
