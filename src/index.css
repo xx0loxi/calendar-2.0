@@ -57,7 +57,7 @@ html.dark {
 }
 
 .slide-in {
-  animation: slide-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes month-enter-next {
@@ -85,18 +85,50 @@ html.dark {
 @keyframes month-title-next {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateX(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes month-title-prev {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes badge-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.badge-enter {
+  animation: badge-enter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.month-grid {
+  /* No transform on grid itself to let children stagger nicely, just opacity */
+  transition: opacity 0.3s ease;
+}
+
+/* Staggered animation for days */
+@keyframes day-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -104,23 +136,45 @@ html.dark {
   }
 }
 
-.month-grid {
-  animation-duration: 0.45s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-fill-mode: both;
+.day-card {
+  animation: day-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-.month-grid.is-next {
-  animation-name: month-enter-next;
-}
-
-.month-grid.is-prev {
-  animation-name: month-enter-prev;
-}
+.day-card:nth-child(1) { animation-delay: 0.02s; }
+.day-card:nth-child(2) { animation-delay: 0.04s; }
+.day-card:nth-child(3) { animation-delay: 0.06s; }
+.day-card:nth-child(4) { animation-delay: 0.08s; }
+.day-card:nth-child(5) { animation-delay: 0.10s; }
+.day-card:nth-child(6) { animation-delay: 0.12s; }
+.day-card:nth-child(7) { animation-delay: 0.14s; }
+.day-card:nth-child(8) { animation-delay: 0.16s; }
+.day-card:nth-child(9) { animation-delay: 0.18s; }
+.day-card:nth-child(10) { animation-delay: 0.20s; }
+.day-card:nth-child(11) { animation-delay: 0.22s; }
+.day-card:nth-child(12) { animation-delay: 0.24s; }
+.day-card:nth-child(13) { animation-delay: 0.26s; }
+.day-card:nth-child(14) { animation-delay: 0.28s; }
+.day-card:nth-child(15) { animation-delay: 0.30s; }
+.day-card:nth-child(16) { animation-delay: 0.32s; }
+.day-card:nth-child(17) { animation-delay: 0.34s; }
+.day-card:nth-child(18) { animation-delay: 0.36s; }
+.day-card:nth-child(19) { animation-delay: 0.38s; }
+.day-card:nth-child(20) { animation-delay: 0.40s; }
+.day-card:nth-child(21) { animation-delay: 0.42s; }
+.day-card:nth-child(22) { animation-delay: 0.44s; }
+.day-card:nth-child(23) { animation-delay: 0.46s; }
+.day-card:nth-child(24) { animation-delay: 0.48s; }
+.day-card:nth-child(25) { animation-delay: 0.50s; }
+.day-card:nth-child(26) { animation-delay: 0.52s; }
+.day-card:nth-child(27) { animation-delay: 0.54s; }
+.day-card:nth-child(28) { animation-delay: 0.56s; }
+.day-card:nth-child(29) { animation-delay: 0.58s; }
+.day-card:nth-child(30) { animation-delay: 0.60s; }
+.day-card:nth-child(31) { animation-delay: 0.62s; }
 
 .month-title {
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
   animation-fill-mode: both;
 }
 
@@ -143,6 +197,23 @@ html.dark {
 
 .glow-soft {
   animation: glow 2.2s ease-in-out infinite;
+}
+
+.glow-red {
+  animation: glow-red 1.9s ease-in-out infinite;
+}
+
+@keyframes glow-red {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  }
+}
+
+.missed-toggle {
+  transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
 }
 
 .device-iphone-11 body {
