@@ -30,10 +30,14 @@ html.dark {
   background-color: #0b1220;
 }
 
+/* ──────────────────────────────────────
+   Base animations
+   ────────────────────────────────────── */
+
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -42,13 +46,13 @@ html.dark {
 }
 
 .fade-in-soft {
-  animation: fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes slide-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -57,35 +61,17 @@ html.dark {
 }
 
 .slide-in {
-  animation: slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes month-enter-next {
-  from {
-    opacity: 0;
-    transform: translateX(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes month-enter-prev {
-  from {
-    opacity: 0;
-    transform: translateX(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+/* ──────────────────────────────────────
+   Month title slide
+   ────────────────────────────────────── */
 
 @keyframes month-title-next {
   from {
     opacity: 0;
-    transform: translateX(8px);
+    transform: translateX(10px);
   }
   to {
     opacity: 1;
@@ -96,7 +82,7 @@ html.dark {
 @keyframes month-title-prev {
   from {
     opacity: 0;
-    transform: translateX(-8px);
+    transform: translateX(-10px);
   }
   to {
     opacity: 1;
@@ -104,77 +90,9 @@ html.dark {
   }
 }
 
-@keyframes badge-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.badge-enter {
-  animation: badge-enter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.month-grid {
-  /* No transform on grid itself to let children stagger nicely, just opacity */
-  transition: opacity 0.3s ease;
-}
-
-/* Staggered animation for days */
-@keyframes day-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.day-card {
-  animation: day-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-
-.day-card:nth-child(1) { animation-delay: 0.02s; }
-.day-card:nth-child(2) { animation-delay: 0.04s; }
-.day-card:nth-child(3) { animation-delay: 0.06s; }
-.day-card:nth-child(4) { animation-delay: 0.08s; }
-.day-card:nth-child(5) { animation-delay: 0.10s; }
-.day-card:nth-child(6) { animation-delay: 0.12s; }
-.day-card:nth-child(7) { animation-delay: 0.14s; }
-.day-card:nth-child(8) { animation-delay: 0.16s; }
-.day-card:nth-child(9) { animation-delay: 0.18s; }
-.day-card:nth-child(10) { animation-delay: 0.20s; }
-.day-card:nth-child(11) { animation-delay: 0.22s; }
-.day-card:nth-child(12) { animation-delay: 0.24s; }
-.day-card:nth-child(13) { animation-delay: 0.26s; }
-.day-card:nth-child(14) { animation-delay: 0.28s; }
-.day-card:nth-child(15) { animation-delay: 0.30s; }
-.day-card:nth-child(16) { animation-delay: 0.32s; }
-.day-card:nth-child(17) { animation-delay: 0.34s; }
-.day-card:nth-child(18) { animation-delay: 0.36s; }
-.day-card:nth-child(19) { animation-delay: 0.38s; }
-.day-card:nth-child(20) { animation-delay: 0.40s; }
-.day-card:nth-child(21) { animation-delay: 0.42s; }
-.day-card:nth-child(22) { animation-delay: 0.44s; }
-.day-card:nth-child(23) { animation-delay: 0.46s; }
-.day-card:nth-child(24) { animation-delay: 0.48s; }
-.day-card:nth-child(25) { animation-delay: 0.50s; }
-.day-card:nth-child(26) { animation-delay: 0.52s; }
-.day-card:nth-child(27) { animation-delay: 0.54s; }
-.day-card:nth-child(28) { animation-delay: 0.56s; }
-.day-card:nth-child(29) { animation-delay: 0.58s; }
-.day-card:nth-child(30) { animation-delay: 0.60s; }
-.day-card:nth-child(31) { animation-delay: 0.62s; }
-
 .month-title {
-  animation-duration: 0.4s;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-fill-mode: both;
 }
 
@@ -185,6 +103,194 @@ html.dark {
 .month-title.is-prev {
   animation-name: month-title-prev;
 }
+
+/* ──────────────────────────────────────
+   Badge
+   ────────────────────────────────────── */
+
+@keyframes badge-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.badge-enter {
+  animation: badge-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ──────────────────────────────────────
+   Month grid — container entrance
+   ────────────────────────────────────── */
+
+@keyframes month-grid-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.month-grid {
+  animation: month-grid-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+/* ──────────────────────────────────────
+   Day cards — staggered entrance
+   Uses inline animationDelay from React
+   ────────────────────────────────────── */
+
+@keyframes day-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.day-card {
+  animation: day-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* ── Day card wrapper — handles show/hide via grid ── */
+
+.day-card-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, margin 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.day-card-wrapper.is-hidden {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  margin-bottom: -0.75rem;
+}
+
+.day-card-wrapper.is-hidden:last-child {
+  margin-bottom: 0;
+}
+
+.day-card-wrapper > .day-card {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ──────────────────────────────────────
+   Day toggle (open/close header)
+   ────────────────────────────────────── */
+
+.day-toggle {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.4s ease, border-radius 0.35s ease;
+}
+
+/* ──────────────────────────────────────
+   Day preview (collapsed summary)
+   ────────────────────────────────────── */
+
+.day-preview {
+  max-height: 80px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
+}
+
+.day-preview.is-hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────
+   Collapsible panel — open/close
+   ────────────────────────────────────── */
+
+.collapsible-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-6px) scaleY(0.98);
+  transform-origin: top center;
+  transition:
+    max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s ease,
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsible-panel.is-open {
+  max-height: 1200px;
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  transition:
+    max-height 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease 0.05s,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Content inside panel */
+.collapsible-panel .collapsible-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapsible-panel:not(.is-open) .collapsible-content {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.99);
+}
+
+/* Stagger children on OPEN */
+.collapsible-panel.is-open .collapsible-content > * {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapsible-panel.is-open .collapsible-content > *:nth-child(1) { transition-delay: 0.08s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(2) { transition-delay: 0.14s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(3) { transition-delay: 0.20s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(4) { transition-delay: 0.26s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(5) { transition-delay: 0.32s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(6) { transition-delay: 0.38s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(7) { transition-delay: 0.44s; }
+.collapsible-panel.is-open .collapsible-content > *:nth-child(8) { transition-delay: 0.50s; }
+
+/* Reverse stagger children on CLOSE */
+.collapsible-panel:not(.is-open) .collapsible-content > * {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(1) { transition-delay: 0.14s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(2) { transition-delay: 0.12s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(3) { transition-delay: 0.10s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(4) { transition-delay: 0.08s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(5) { transition-delay: 0.06s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(6) { transition-delay: 0.04s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(7) { transition-delay: 0.02s; }
+.collapsible-panel:not(.is-open) .collapsible-content > *:nth-child(8) { transition-delay: 0s; }
+
+/* ──────────────────────────────────────
+   Glow effects
+   ────────────────────────────────────── */
 
 @keyframes glow {
   0%, 100% {
@@ -199,10 +305,6 @@ html.dark {
   animation: glow 2.2s ease-in-out infinite;
 }
 
-.glow-red {
-  animation: glow-red 1.9s ease-in-out infinite;
-}
-
 @keyframes glow-red {
   0%, 100% {
     box-shadow: 0 0 0 rgba(239, 68, 68, 0);
@@ -212,177 +314,117 @@ html.dark {
   }
 }
 
+.glow-red {
+  animation: glow-red 1.9s ease-in-out infinite;
+}
+
+/* ──────────────────────────────────────
+   Missed toggle button
+   ────────────────────────────────────── */
+
+@keyframes missed-pulse {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.82); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
 .missed-toggle {
-  transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.device-iphone-11 body {
-  font-size: 16px;
+.missed-toggle:active {
+  animation: missed-pulse 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.device-iphone-11 .max-w-md {
-  max-width: 28rem;
+.missed-toggle svg {
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.device-iphone-11 .px-4 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
+.missed-toggle:active svg {
+  transform: rotate(8deg);
 }
 
-.device-iphone-11 .p-4 {
-  padding: 1.1rem;
+/* ──────────────────────────────────────
+   Missed filter button
+   ────────────────────────────────────── */
+
+@keyframes filter-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.94); }
+  100% { transform: scale(1); }
 }
 
-.device-iphone-12 body,
-.device-iphone-14 body,
-.device-iphone-16 body {
-  font-size: 15.5px;
+.missed-filter-btn:active {
+  animation: filter-pulse 0.25s ease;
 }
 
-.device-iphone-12 .max-w-md,
-.device-iphone-14 .max-w-md,
-.device-iphone-16 .max-w-md {
-  max-width: 24rem;
+/* ──────────────────────────────────────
+   Search highlight
+   ────────────────────────────────────── */
+
+@keyframes search-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0), inset 0 0 0 rgba(245, 158, 11, 0);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.2), inset 0 0 8px rgba(245, 158, 11, 0.06);
+  }
 }
 
-.device-iphone-12 .px-4,
-.device-iphone-14 .px-4,
-.device-iphone-16 .px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
+.search-highlight {
+  animation: search-glow 2.2s ease-in-out infinite;
 }
 
-.device-iphone-12 .p-4,
-.device-iphone-14 .p-4,
-.device-iphone-16 .p-4 {
-  padding: 1rem;
+/* ──────────────────────────────────────
+   Responsive (replacing device detection)
+   ────────────────────────────────────── */
+
+@media (max-width: 375px) {
+  body {
+    font-size: 15px;
+  }
+  .max-w-md {
+    max-width: 22rem;
+  }
 }
 
-.device-iphone-12 .text-xl,
-.device-iphone-14 .text-xl,
-.device-iphone-16 .text-xl {
-  font-size: 1.15rem;
+@media (min-width: 376px) and (max-width: 414px) {
+  body {
+    font-size: 15.5px;
+  }
+  .max-w-md {
+    max-width: 24rem;
+  }
 }
 
-.device-iphone-12 .text-lg,
-.device-iphone-14 .text-lg,
-.device-iphone-16 .text-lg {
-  font-size: 1.05rem;
-}
-
-.device-a56 body {
-  font-size: 15px;
-}
-
-.device-a56 .max-w-md {
-  max-width: 22rem;
-}
-
-.device-a56 .px-4 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-.device-a56 .p-4 {
-  padding: 0.85rem;
-}
-
-.device-a56 .text-xl {
-  font-size: 1.1rem;
-}
-
-.device-a56 .text-lg {
-  font-size: 1rem;
-}
-
-.collapsible-panel {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transform: translateY(-4px);
-  transition: max-height 0.75s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease, transform 0.5s ease;
-}
-
-.collapsible-panel.is-open {
-  max-height: 900px;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.collapsible-panel .collapsible-content {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition: opacity 0.5s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: 0.2s;
-}
-
-.collapsible-panel.is-open .collapsible-content {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition-delay: 0s;
-}
-
-.collapsible-panel .collapsible-content > * {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: 0.2s;
-}
-
-.collapsible-panel.is-open .collapsible-content > * {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0s;
-}
-
-.collapsible-panel:not(.is-open) .collapsible-content {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.992);
-}
-
-.collapsible-panel:not(.is-open) .collapsible-content > * {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-
-.collapsible-panel.is-open .collapsible-content > *:nth-child(1) { transition-delay: 0.08s; }
-.collapsible-panel.is-open .collapsible-content > *:nth-child(2) { transition-delay: 0.12s; }
-.collapsible-panel.is-open .collapsible-content > *:nth-child(3) { transition-delay: 0.16s; }
-.collapsible-panel.is-open .collapsible-content > *:nth-child(4) { transition-delay: 0.2s; }
-.collapsible-panel.is-open .collapsible-content > *:nth-child(5) { transition-delay: 0.24s; }
-.collapsible-panel.is-open .collapsible-content > *:nth-child(6) { transition-delay: 0.28s; }
-
-.day-preview {
-  max-height: 80px;
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease;
-}
-
-.day-toggle {
-  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.45s ease, transform 0.45s ease;
-}
-
-.day-preview.is-hidden {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-}
+/* ──────────────────────────────────────
+   Reduced motion
+   ────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   .fade-in-soft,
   .slide-in,
   .glow-soft,
+  .glow-red,
   .month-grid,
-  .month-title {
-    animation: none;
+  .month-title,
+  .day-card,
+  .badge-enter,
+  .search-highlight,
+  .missed-filter-btn:active,
+  .missed-toggle:active {
+    animation: none !important;
   }
-  .collapsible-panel {
-    transition: none;
-  }
+  .day-card,
+  .day-card-wrapper,
+  .collapsible-panel,
   .collapsible-panel .collapsible-content,
-  .day-preview {
-    transition: none;
+  .collapsible-panel .collapsible-content > *,
+  .day-preview,
+  .day-toggle,
+  .missed-toggle,
+  .missed-toggle svg {
+    transition: none !important;
   }
 }

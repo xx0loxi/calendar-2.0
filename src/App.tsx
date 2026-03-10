@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { scheduleGroups, type Lesson, type DaySchedule } from './data/schedule'
-import { CheckCircle2, XCircle, User, MapPin, ChevronLeft, ChevronRight, Plus, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { scheduleGroups, DEFAULT_GROUP_ID, type Lesson, type DaySchedule } from './data/schedule'
+import { CheckCircle2, XCircle, Calendar, User, MapPin, ChevronLeft, ChevronRight, Plus, ChevronDown, Search, X } from 'lucide-react'
 
 function App() {
   const canUseStorage = typeof window !== 'undefined' && 'localStorage' in window;
@@ -42,7 +42,7 @@ function App() {
       if (hasGroupKey) {
         return parsed;
       }
-      const fallbackGroup = scheduleGroups[0]?.id ?? 'bn-3-2';
+      const fallbackGroup = DEFAULT_GROUP_ID;
       return { [fallbackGroup]: parsed };
     } catch {
       return {};
@@ -74,47 +74,19 @@ function App() {
     return () => media.removeEventListener('change', listener);
   }, []);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const root = document.documentElement;
-    const deviceClasses = ['device-iphone-11', 'device-iphone-12', 'device-iphone-14', 'device-iphone-16', 'device-a56'];
-    const applyDeviceClass = () => {
-      const width = Math.min(window.innerWidth, window.innerHeight);
-      const height = Math.max(window.innerWidth, window.innerHeight);
-      const dpr = window.devicePixelRatio || 1;
-      let nextClasses: string[] = [];
-      if (width === 414 && height === 896 && dpr >= 2) {
-        nextClasses = ['device-iphone-11'];
-      } else if (width === 390 && height === 844 && dpr >= 3) {
-        nextClasses = ['device-iphone-12', 'device-iphone-14'];
-      } else if (width === 393 && height === 852 && dpr >= 3) {
-        nextClasses = ['device-iphone-16'];
-      } else if (width === 360 && height >= 760 && height <= 820) {
-        nextClasses = ['device-a56'];
-      }
-      deviceClasses.forEach(item => root.classList.remove(item));
-      nextClasses.forEach(item => root.classList.add(item));
-    };
-    applyDeviceClass();
-    window.addEventListener('resize', applyDeviceClass);
-    return () => window.removeEventListener('resize', applyDeviceClass);
-  }, []);
-
-  const scheduleGroupsById = scheduleGroups.reduce<Record<string, { id: string; label: string; days: DaySchedule[] }>>((acc, group) => {
+  const scheduleGroupsById = useMemo(() => scheduleGroups.reduce<Record<string, { id: string; label: string; days: DaySchedule[] }>>((acc, group) => {
     acc[group.id] = group;
     return acc;
-  }, {});
+  }, {}), []);
   const [activeGroupId, setActiveGroupId] = useState(() => {
     if (!canUseStorage) {
-      return scheduleGroups[0]?.id ?? 'bn-3-2';
+      return DEFAULT_GROUP_ID;
     }
     try {
       const saved = localStorage.getItem('activeGroupId');
-      return saved && scheduleGroupsById[saved] ? saved : (scheduleGroups[0]?.id ?? 'bn-3-2');
+      return saved && scheduleGroupsById[saved] ? saved : (DEFAULT_GROUP_ID);
     } catch {
-      return scheduleGroups[0]?.id ?? 'bn-3-2';
+      return DEFAULT_GROUP_ID;
     }
   });
   useEffect(() => {
@@ -140,10 +112,10 @@ function App() {
     currentMonth.getMonth() === today.getMonth();
   const monthLabel = currentMonth.toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
   const monthTitle = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
-  const scheduleById = (activeGroup?.days ?? []).reduce<Record<string, DaySchedule>>((acc, day) => {
+  const scheduleById = useMemo(() => (activeGroup?.days ?? []).reduce<Record<string, DaySchedule>>((acc, day) => {
     acc[day.id] = day;
     return acc;
-  }, {});
+  }, {}), [activeGroup]);
   const getDateKey = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -200,11 +172,11 @@ function App() {
     return initialDays[0] ? [initialDays[0].dateKey] : [];
   });
 
-  const monthDays = getMonthDays(currentMonth);
-  const dayByDateKey = monthDays.reduce<Record<string, { dayId: string; lessons: Lesson[] }>>((acc, day) => {
+  const monthDays = useMemo(() => getMonthDays(currentMonth), [currentMonth, scheduleById]);
+  const dayByDateKey = useMemo(() => monthDays.reduce<Record<string, { dayId: string; lessons: Lesson[] }>>((acc, day) => {
     acc[day.dateKey] = { dayId: day.dayId, lessons: day.lessons };
     return acc;
-  }, {});
+  }, {}), [monthDays]);
   const getNextIndex = (dateKeys: string[]) => {
     let maxIndex = 0;
     dateKeys.forEach(dateKey => {
@@ -337,7 +309,10 @@ function App() {
       return next;
     });
   };
-  const monthMissedCount = monthDays.reduce((acc, day) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showMissedOnly, setShowMissedOnly] = useState(false);
+
+  const monthMissedCount = useMemo(() => monthDays.reduce((acc, day) => {
     const dateExtra = customLessons[day.dateKey] ?? [];
     const legacyExtra = customLessons[day.dayId] ?? [];
     const allLessons = [...day.lessons, ...dateExtra, ...legacyExtra];
@@ -348,7 +323,60 @@ function App() {
       const legacyLessonKey = `${legacyDayKey}:${lesson.id}`;
       return missedLessons.has(lessonKey) || missedLessons.has(legacyLessonKey) ? innerAcc + 1 : innerAcc;
     }, 0);
-  }, 0);
+  }, 0), [monthDays, customLessons, activeGroup, missedLessons]);
+
+  const filteredDateKeys = useMemo(() => {
+    const keys = new Set<string>();
+    let days = monthDays;
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      days = days.filter(day => {
+        const dateExtra = customLessons[day.dateKey] ?? [];
+        const legacyExtra = customLessons[day.dayId] ?? [];
+        const allLessons = [...day.lessons, ...dateExtra, ...legacyExtra];
+        return allLessons.some(lesson =>
+          lesson.subject.toLowerCase().includes(q) || lesson.teacher.toLowerCase().includes(q)
+        );
+      });
+    }
+    if (showMissedOnly) {
+      days = days.filter(day => {
+        const dateExtra = customLessons[day.dateKey] ?? [];
+        const legacyExtra = customLessons[day.dayId] ?? [];
+        const allLessons = [...day.lessons, ...dateExtra, ...legacyExtra];
+        const dayKey = `${activeGroup?.id ?? 'group'}:${day.dateKey}`;
+        const legacyDayKey = day.dateKey;
+        return allLessons.some(lesson => {
+          const lessonKey = `${dayKey}:${lesson.id}`;
+          const legacyLessonKey = `${legacyDayKey}:${lesson.id}`;
+          return missedLessons.has(lessonKey) || missedLessons.has(legacyLessonKey);
+        });
+      });
+    }
+    days.forEach(day => keys.add(day.dateKey));
+    return keys;
+  }, [monthDays, searchQuery, customLessons, showMissedOnly, missedLessons, activeGroup]);
+
+  const isFiltering = searchQuery.trim() !== '' || showMissedOnly;
+
+  const searchMatchCount = useMemo(() => {
+    if (!searchQuery.trim()) return 0;
+    const q = searchQuery.trim().toLowerCase();
+    return monthDays.filter(d => filteredDateKeys.has(d.dateKey)).reduce((acc, day) => {
+      const dateExtra = customLessons[day.dateKey] ?? [];
+      const legacyExtra = customLessons[day.dayId] ?? [];
+      const allLessons = [...day.lessons, ...dateExtra, ...legacyExtra];
+      return acc + allLessons.filter(lesson =>
+        lesson.subject.toLowerCase().includes(q) || lesson.teacher.toLowerCase().includes(q)
+      ).length;
+    }, 0);
+  }, [monthDays, filteredDateKeys, searchQuery, customLessons]);
+
+  const isSearchMatch = (lesson: Lesson) => {
+    if (!searchQuery.trim()) return false;
+    const q = searchQuery.trim().toLowerCase();
+    return lesson.subject.toLowerCase().includes(q) || lesson.teacher.toLowerCase().includes(q);
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 pb-12 font-sans transition-colors duration-300">
@@ -397,6 +425,47 @@ function App() {
               </div>
             </div>
 
+            <div className="flex items-center gap-2 fade-in-soft">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Пошук предмету або викладача..."
+                  className="w-full rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 pl-9 pr-9 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all shadow-sm"
+                />
+                {searchQuery && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60">{searchMatchCount}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="p-0.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMissedOnly(prev => !prev)}
+                className={`missed-filter-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-xs font-semibold transition-all duration-300 active:scale-95 ${
+                  showMissedOnly
+                    ? 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 border-red-300/80 dark:border-red-800/80 shadow-sm shadow-red-200/50 dark:shadow-red-950/40'
+                    : 'bg-white/90 dark:bg-slate-900/70 text-slate-500 dark:text-slate-400 border-slate-200/80 dark:border-slate-800/80 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800/60'
+                }`}
+                aria-label="Показати лише пропуски"
+              >
+                <XCircle className={`w-3.5 h-3.5 transition-transform duration-300 ${showMissedOnly ? 'rotate-0' : '-rotate-90'}`} />
+                {showMissedOnly && <span>Пропуски</span>}
+                {showMissedOnly && monthMissedCount > 0 && (
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-200 dark:bg-red-800/70 text-red-800 dark:text-red-100 text-[10px] font-bold flex items-center justify-center">{monthMissedCount}</span>
+                )}
+              </button>
+            </div>
+
             <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/70 px-3 py-2.5 shadow-sm">
               <button
                 onClick={goPrevMonth}
@@ -432,7 +501,7 @@ function App() {
 
       <main className="max-w-md mx-auto px-4 py-4 space-y-3 relative">
         <div className="flex justify-center -my-0.5">
-          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 px-2.5 py-0.5 rounded-full shadow-sm shadow-slate-200/70 dark:shadow-slate-950/40 tracking-wide">Версія 3.1.5</span>
+          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700 px-2.5 py-0.5 rounded-full shadow-sm shadow-slate-200/70 dark:shadow-slate-950/40 tracking-wide">Версія 3.2.0</span>
         </div>
         <form onSubmit={addCustomLesson} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-3 fade-in-soft">
           <div className="flex items-center justify-between">
@@ -534,10 +603,11 @@ function App() {
         </form>
 
         <div
-          key={`${currentMonth.getFullYear()}-${currentMonth.getMonth()}`}
-          className={`month-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
+          key={`${currentMonth.getFullYear()}-${currentMonth.getMonth()}-${activeGroupId}`}
+          className={`month-grid flex flex-col gap-3 ${monthDirection === 'next' ? 'is-next' : 'is-prev'}`}
         >
-        {monthDays.map((day) => {
+        {monthDays.map((day, dayIndex) => {
+          const isDayVisible = !isFiltering || filteredDateKeys.has(day.dateKey);
           const dateLabel = day.date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
           const isToday = day.dateKey === todayKey;
           const dateExtra = customLessons[day.dateKey] ?? [];
@@ -562,11 +632,12 @@ function App() {
             return missedLessons.has(lessonKey) || missedLessons.has(legacyLessonKey) ? acc + 1 : acc;
           }, 0);
           return (
-          <div key={dayKey} className={`day-card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden fade-in-soft transform-gpu transition-transform duration-200 hover:-translate-y-0.5 ${isToday ? 'ring-1 ring-emerald-200/80 dark:ring-emerald-800/80' : ''}`}>
+          <div key={dayKey} className={`day-card-wrapper ${isDayVisible ? '' : 'is-hidden'}`} style={{ animationDelay: `${dayIndex * 0.04}s` }}>
+          <div className={`day-card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hover:-translate-y-0.5 transition-transform ${isToday ? 'ring-1 ring-emerald-200/80 dark:ring-emerald-800/80' : ''}`} style={{ animationDelay: `${dayIndex * 0.04}s` }}>
             <button
               type="button"
               onClick={() => toggleDayOpen(dayKey)}
-              className={`day-toggle group w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${
+              className={`day-toggle w-full text-left bg-white/95 dark:bg-slate-900/80 backdrop-blur px-3.5 py-3 border-b border-slate-200/80 dark:border-slate-700/80 flex items-center gap-3 transition-all duration-300 shadow-[0_1px_6px_rgba(15,23,42,0.06)] ${
                 isOpen
                   ? 'rounded-t-2xl'
                   : 'rounded-2xl hover:bg-slate-50/90 dark:hover:bg-slate-800/80 hover:shadow-sm border border-slate-200/80 dark:border-slate-800/80'
@@ -574,13 +645,8 @@ function App() {
               style={{ transitionDelay: isOpen ? '0ms' : '160ms' }}
               aria-expanded={isOpen}
             >
-              <div className="p-2 bg-blue-100/80 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-xl shadow-sm transition-colors duration-300 group-hover:bg-blue-200/80 dark:group-hover:bg-blue-900/60">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 transition-transform duration-300 group-hover:scale-110">
-                  <path d="M8 2v4" />
-                  <path d="M16 2v4" />
-                  <rect width="18" height="18" x="3" y="4" rx="2" className="fill-current opacity-20" />
-                  <path d="M3 10h18" />
-                </svg>
+              <div className="p-2 bg-blue-100/80 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-xl shadow-sm">
+                <Calendar className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{day.dayName}</h2>
@@ -609,6 +675,7 @@ function App() {
               </div>
             </button>
 
+            {isDayVisible && (
             <div className={`collapsible-panel ${isOpen ? 'is-open' : ''}`}>
               <div className="collapsible-content">
                 {allLessons.map((lesson) => {
@@ -617,11 +684,12 @@ function App() {
                 const isMissed = missedLessons.has(lessonKey) || missedLessons.has(legacyLessonKey);
                 const customSourceKey = customSourceById.get(lesson.id);
                 const isCustom = Boolean(customSourceKey);
+                const isHighlighted = isSearchMatch(lesson);
                 return (
-                  <div 
-                    key={lessonKey} 
+                  <div
+                    key={lessonKey}
                     className={`p-4 last:pb-3 last:rounded-b-2xl transition-all duration-250 slide-in ${
-                      isMissed ? 'bg-red-50/80 dark:bg-red-950/30 border border-red-200/70 dark:border-red-900/60 shadow-sm shadow-red-100/60 dark:shadow-red-950/40' : 'bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:shadow-sm'
+                      isMissed ? 'bg-red-50/80 dark:bg-red-950/30 border border-red-200/70 dark:border-red-900/60 shadow-sm shadow-red-100/60 dark:shadow-red-950/40' : isHighlighted ? 'search-highlight bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/60 shadow-sm shadow-amber-100/60 dark:shadow-amber-950/40' : 'bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex justify-between items-start gap-4">
@@ -631,7 +699,7 @@ function App() {
                         }`}>
                           {lesson.index}
                         </div>
-                        
+
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1.5">
                             <h3 className={`font-semibold text-base leading-snug ${
@@ -645,7 +713,7 @@ function App() {
                               </span>
                             )}
                           </div>
-                          
+
                           <div className={`flex flex-wrap gap-y-1 gap-x-3 text-sm ${
                             isMissed ? 'text-red-600 dark:text-red-200' : 'text-slate-500 dark:text-slate-300'
                           }`}>
@@ -681,8 +749,8 @@ function App() {
                         <button
                           onClick={() => toggleMissed(lessonKey, legacyLessonKey)}
                           className={`missed-toggle flex-shrink-0 p-2 rounded-xl transition-all duration-300 ${
-                            isMissed 
-                              ? 'bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300 shadow-inner' 
+                            isMissed
+                              ? 'bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300 shadow-inner'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-100'
                           }`}
                           aria-label={isMissed ? "Скасувати пропуск" : "Відмітити пропуск"}
@@ -701,6 +769,8 @@ function App() {
                 )}
               </div>
             </div>
+            )}
+          </div>
           </div>
         )})}
         </div>

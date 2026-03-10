@@ -127,3 +127,5 @@ export const scheduleGroups: ScheduleGroup[] = [
     ]
   }
 ];
+
+export const DEFAULT_GROUP_ID = scheduleGroups[0]?.id ?? 'bn-3-2';
